@@ -41,7 +41,7 @@ public protocol SnapshotProtocol {
 	func diff(with other: Self) -> Diff
 }
 
-extension SnapshotProtocol {
+public extension SnapshotProtocol {
 	/// helper to get a section at an index if it exists, or nil otherwise
 	func sectionOrNil(at index: Int) -> Section.SectionType? {
 		guard index >= 0 && index < numberOfSections else {return nil}

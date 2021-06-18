@@ -20,9 +20,13 @@ public struct Snapshot<SectionType: Identifiable, ItemType: Identifiable>: Snaps
 		public var sectionItem: SectionType
 		public var items: [ItemType]
 		public var id: SectionType.ID {sectionItem.id}
+
+		public init(sectionItem: SectionType, items: [ItemType]) {
+			self.sectionItem = sectionItem
+			self.items = items
+		}
 	}
 	public var sections: [Section] = []
-
 
 	/// creates an empty snapshot
 	public init() {
