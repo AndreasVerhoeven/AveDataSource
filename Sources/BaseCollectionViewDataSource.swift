@@ -124,6 +124,23 @@ public class BaseCollectionViewDataSource<Snapshot: SnapshotProtocol> : NSObject
 }
 
 public extension BaseCollectionViewDataSource {
+	/// Creates a data source where every cell is of a specified type.
+	convenience init<T: UICollectionViewCell>(
+		collectionView: UICollectionView,
+		cellsWithClass cellClass: T.Type,
+		updater: ((_ collectionView: UICollectionView, _ cell: T, _ item: ItemType, _ indexPath: IndexPath, _ animated: Bool) -> Void)? = nil) {
+		collectionView.register(cellClass, forCellWithReuseIdentifier: "Cell")
+		
+		self.init(collectionView: collectionView, cellProvider: {collectionView, _, indexPath in
+			return collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath)
+		})
+		
+		guard let updater = updater else { return }
+		self.cellUpdater = { collectionView, cell, item, indexPath, animated in
+			guard let cell = cell as? T else { return }
+			updater(collectionView, cell, item, indexPath, animated)
+		}
+	}
 
 	/// creates a data source where every cell is of the same type
 	convenience init(collectionView: UICollectionView, cellsWithIdentifier cellIdentifier: String) {
@@ -147,3 +164,4 @@ public extension BaseCollectionViewDataSource {
 		return item(at: IndexPath(row: indexPath.row - 1, section: indexPath.section))
 	}
 }
+
