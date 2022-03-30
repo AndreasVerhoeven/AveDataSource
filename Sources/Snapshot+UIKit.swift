@@ -87,11 +87,14 @@ extension SnapshotProtocol {
 							let newIndexPath = IndexPath(index: newSectionIndex)
 							updateSupplementaryView(view, other.sectionOrNil(at: newSectionIndex), newIndexPath, kind, true)
 						} else {
-							let itemIdentifier = oldSnapshot.item(at: indexPath).id
-
-							let newRowIndex = section.newIndexFor(identifier: itemIdentifier) ?? indexPath.row
-							let newIndexPath = IndexPath(row: newRowIndex, section: newSectionIndex)
-							updateSupplementaryView(view, other.sectionOrNil(at: newSectionIndex), newIndexPath, kind, true)
+							if let itemIdentifier = oldSnapshot.itemOrNil(at: indexPath)?.id {
+								let newRowIndex = section.newIndexFor(identifier: itemIdentifier) ?? indexPath.row
+								let newIndexPath = IndexPath(row: newRowIndex, section: newSectionIndex)
+								updateSupplementaryView(view, other.sectionOrNil(at: newSectionIndex), newIndexPath, kind, true)
+							} else {
+								let newIndexPath = IndexPath(index: newSectionIndex)
+								updateSupplementaryView(view, other.sectionOrNil(at: newSectionIndex), newIndexPath, kind, true)
+							}
 						}
 					}
 				}
