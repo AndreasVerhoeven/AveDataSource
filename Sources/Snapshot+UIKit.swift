@@ -78,7 +78,7 @@ extension SnapshotProtocol {
 				for kind in elementaryViewKinds {
 					for indexPath in collectionView.indexPathsForVisibleSupplementaryElements(ofKind: kind) {
 						guard let view = collectionView.supplementaryView(forElementKind: kind, at: indexPath) else {continue}
-						guard let indexPathSection = indexPath.last else {continue}
+						guard let indexPathSection = indexPath.first else {continue}
 
 						guard let section = diff.commonSectionResults[indexPathSection] else {continue}
 						let sectionIdentifier = oldSnapshot.section(at: indexPathSection).id
