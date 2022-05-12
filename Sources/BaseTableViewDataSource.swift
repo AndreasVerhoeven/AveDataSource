@@ -158,4 +158,30 @@ public extension BaseTableViewDataSource {
 		self.init(tableView: tableView, cellProvider: { tableView, _, _ in return tableView.dequeueReusableCell(withIdentifier: "Cell") })
 		self.cellUpdater = updater
 	}
+	
+	// creates a data source where every cell is of the specific type
+	convenience init<T: UITableViewCell>(
+		tableView: UITableView,
+		cellClass: T.Type,
+		style: UITableViewCell.CellStyle = .default,
+		updater: ((_ tableView: UITableView, _ cell: UITableViewCell, _ item: ItemType, _ indexPath: IndexPath, _ animated: Bool) -> Void)? = nil) {
+			if style == .default {
+				tableView.register(cellClass, forCellReuseIdentifier: "Cell")
+			}
+			
+			self.init(tableView: tableView, cellProvider: { tableView, _, _ in
+				if style == .default {
+					return tableView.dequeueReusableCell(withIdentifier: "Cell")
+				} else {
+					// swiftlint:disable:next explicit_init
+					return tableView.dequeueReusableCell(withIdentifier: "Cell") ?? T.init(style: style, reuseIdentifier: "Cell")
+				}
+			})
+			
+			guard let updater = updater else { return }
+			self.cellUpdater = { tableView, cell, item, indexPath, animated in
+				guard let cell = cell as? T else { return }
+				updater(tableView, cell, item, indexPath, animated)
+			}
+	}
 }
