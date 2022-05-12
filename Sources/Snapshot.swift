@@ -145,3 +145,30 @@ public extension Snapshot {
 	}
 }
 
+
+public extension Snapshot {
+	/// find the first index path that matches the callback
+	func firstIndexPath(where callback: (ItemType) -> Bool) -> IndexPath? {
+		for (sectionIndex, sectionItem) in sections.enumerated() {
+			if let itemIndex = sectionItem.items.firstIndex(where: callback) {
+				return IndexPath(row: itemIndex, section: sectionIndex)
+			}
+		}
+		return nil
+	}
+	
+	/// find the first index path that matches the given item by id
+	func firstIndexPath(of item: ItemType) -> IndexPath? {
+		return firstIndexPath(where: { $0.id == item.id })
+	}
+	
+	/// fins the first item matching the callback
+	func firstItem(where matching: (ItemType) -> Bool) -> ItemType? {
+		return firstIndexPath(where: matching).flatMap { self[$0] }
+	}
+	
+	subscript(_ indexPath: IndexPath) -> ItemType? {
+		get { itemOrNil(at: indexPath) }
+		set { newValue.flatMap { sections[indexPath.section].items[indexPath.row] = $0 } }
+	}
+}
