@@ -157,7 +157,7 @@ public extension BaseTableViewDataSource {
 		tableView: UITableView,
 		cellClass: T.Type,
 		style: UITableViewCell.CellStyle = .default,
-		updater: ((_ tableView: UITableView, _ cell: UITableViewCell, _ item: ItemType, _ indexPath: IndexPath, _ animated: Bool) -> Void)? = nil) {
+		updater: ((_ tableView: UITableView, _ cell: T, _ item: ItemType, _ indexPath: IndexPath, _ animated: Bool) -> Void)? = nil) {
 			if style == .default {
 				tableView.register(cellClass, forCellReuseIdentifier: "Cell")
 			}
