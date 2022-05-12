@@ -153,13 +153,6 @@ public extension BaseTableViewDataSource {
 
 
 	/// creates a data source where every cell is of the same type
-	convenience init(tableView: UITableView, cellClass: UITableViewCell.Type, updater: CellUpdater? = nil) {
-		tableView.register(cellClass, forCellReuseIdentifier: "Cell")
-		self.init(tableView: tableView, cellProvider: { tableView, _, _ in return tableView.dequeueReusableCell(withIdentifier: "Cell") })
-		self.cellUpdater = updater
-	}
-	
-	// creates a data source where every cell is of the specific type
 	convenience init<T: UITableViewCell>(
 		tableView: UITableView,
 		cellClass: T.Type,
