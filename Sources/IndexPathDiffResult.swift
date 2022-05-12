@@ -8,6 +8,6 @@
 import Foundation
 
 public struct IndexPathDiffResult<SectionType: Identifiable, ItemType: Identifiable> {
-	var sectionResults = List.Result<SectionType>()
-	var commonSectionResults = Dictionary<Int, List.Result<ItemType>>()
+	public var sectionResults = List.Result<SectionType>()
+	public var commonSectionResults = Dictionary<Int, List.Result<ItemType>>()
 }
