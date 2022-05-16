@@ -70,7 +70,7 @@ extension SnapshotProtocol {
 					  completion: ((Bool) -> Void)? = nil) {
 
 		collectionView.performBatchUpdates({
-			let visibleItems = collectionView.visibleAndPrefetchedCellsWithIndexPaths
+			let visibleItems = collectionView.visibleCells.compactMap({cell in collectionView.indexPath(for: cell).map({(cell, $0)}) })
 
 			let oldSnapshot = self
 			let additionalUpdates: (Diff) -> Void = { diff in

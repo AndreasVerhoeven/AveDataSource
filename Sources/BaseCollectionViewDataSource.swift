@@ -36,7 +36,6 @@ public class BaseCollectionViewDataSource<Snapshot: SnapshotProtocol> : NSObject
 	public func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 		let item = currentSnapshot.item(at: indexPath)
 		guard let cell = cellProvider(collectionView, item, indexPath) else {return UICollectionViewCell()}
-		cell.taggedIndexPath = indexPath
 		cellUpdater?(collectionView, cell, item, indexPath, false)
 		return cell
 	}
@@ -90,7 +89,6 @@ public class BaseCollectionViewDataSource<Snapshot: SnapshotProtocol> : NSObject
 		self.collectionView = collectionView
 		self.cellProvider = cellProvider
 		super.init()
-		self.collectionView.isPrefetchingEnabled = collectionView.canSafelyUsePrefetching
 		self.collectionView.dataSource = self
 	}
 
@@ -113,6 +111,10 @@ public class BaseCollectionViewDataSource<Snapshot: SnapshotProtocol> : NSObject
 			return
 		}
 
+		// toggle prefetching to get rid of prefetched cells
+		collectionView.isPrefetchingEnabled.toggle()
+		collectionView.isPrefetchingEnabled.toggle()
+		
 		actualSnapshot.applyChanges(from: snapshot,
 									 to: collectionView,
 									 elementaryViewKinds: elementaryViewKinds,

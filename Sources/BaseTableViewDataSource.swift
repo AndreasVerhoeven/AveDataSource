@@ -112,6 +112,12 @@ public class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UIT
 			return
 		}
 
+		if #available(iOS 15, *) {
+			// toggle prefetching to get rid of prefetched cells
+			tableView.isPrefetchingEnabled.toggle()
+			tableView.isPrefetchingEnabled.toggle()
+		}
+		
 		actualSnapshot.applyChanges(from: snapshot,
 									 to: tableView,
 									 updateData: {actualSnapshot = $0},
