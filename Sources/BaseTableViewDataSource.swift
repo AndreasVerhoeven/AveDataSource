@@ -8,7 +8,7 @@
 import UIKit
 
 /// Our base table view data source. Use this to manage a snapshot and provide the right callbacks.
-public class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITableViewDataSource {
+open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITableViewDataSource {
 	public typealias ItemType = Snapshot.Section.ItemType
 	public typealias SectionType = Snapshot.Section.SectionType
 

@@ -8,7 +8,7 @@
 import UIKit
 
 /// a data source that manages data in collection view thru snapshots.
-public class BaseCollectionViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UICollectionViewDataSource {
+open class BaseCollectionViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UICollectionViewDataSource {
 	public typealias ItemType = Snapshot.Section.ItemType
 	public typealias SectionType = Snapshot.Section.SectionType
 

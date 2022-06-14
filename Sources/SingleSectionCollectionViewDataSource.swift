@@ -9,7 +9,7 @@ import UIKit
 
 /// A data source for when there's only a single section in the collection view. This is optimized, so that
 /// one doesn't have to provide a section type.
-public class SingleSectionCollectionViewDataSource<ItemType: Identifiable>: BaseCollectionViewDataSource<SingleSectionSnapshot<ItemType> > {
+open class SingleSectionCollectionViewDataSource<ItemType: Identifiable>: BaseCollectionViewDataSource<SingleSectionSnapshot<ItemType> > {
 	public func apply(items: [ItemType], animated: Bool = true, completion: ((Bool) -> Void)? = nil) {
 		apply(SingleSectionSnapshot<ItemType>(items: items), animated: animated, completion: completion)
 	}
