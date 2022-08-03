@@ -107,7 +107,7 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 		}
 
 		guard animated == true else {
-			currentSnapshot = snapshot
+			actualSnapshot = snapshot
 			tableView.reloadData()
 			return
 		}
