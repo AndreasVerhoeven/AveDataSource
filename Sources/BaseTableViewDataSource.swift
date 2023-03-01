@@ -8,7 +8,7 @@
 import UIKit
 
 /// Our base table view data source. Use this to manage a snapshot and provide the right callbacks.
-open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITableViewDataSource {
+open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITableViewDataSource, UITableViewDelegate {
 	public typealias ItemType = Snapshot.Section.ItemType
 	public typealias SectionType = Snapshot.Section.SectionType
 
@@ -23,6 +23,12 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 
 	/// called when we need a header/footer title
 	public typealias HeaderFooterTitleProvider = (_ tableView: UITableView, _ section: SectionType, _ index: Int) -> String?
+	
+	// called when a header/footer is updated
+	public typealias HeaderFooterViewUpdater = (_ tableView: UITableView, _ view: UIView, _ section: SectionType, _ index: Int, _ animated: Bool) -> Void
+	
+	// called when a row is selected
+	public typealias SelectionCallback = (_ tableView: UITableView, _ item: ItemType, _ indexPath: IndexPath) -> Void
 
 	/// MARK: - UITableViewDataSource
 	public func numberOfSections(in tableView: UITableView) -> Int {
@@ -41,11 +47,42 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 	}
 
 	public func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+		// WORKAROUND (iOS 12, *) UIKit sometimes calls this method when we don't have any sections
+		guard section < currentSnapshot.numberOfSections else { return nil }
 		return headerTitleProvider?(tableView, currentSnapshot.section(at: section).sectionItem, section)
 	}
-
+	
 	public func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+		// WORKAROUND (iOS 12, *) UIKit sometimes calls this method when we don't have any sections
+		guard section < currentSnapshot.numberOfSections else { return nil }
 		return footerTitleProvider?(tableView, currentSnapshot.section(at: section).sectionItem, section)
+	}
+	
+	// MARK: - UITableViewDelegate
+	public func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+		// WORKAROUND (iOS 12, *) UIKit sometimes calls this method when we don't have any sections
+		guard section < currentSnapshot.numberOfSections else { return nil }
+		let sectionItem = currentSnapshot.section(at: section).sectionItem
+		let view = headerViewProvider?(tableView, sectionItem, section)
+		if let view = view {
+			headerViewUpdater?(tableView, view, sectionItem, section, false)
+		}
+		return view
+	}
+	
+	public func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+		// WORKAROUND (iOS 12, *) UIKit sometimes calls this method when we don't have any sections
+		guard section < currentSnapshot.numberOfSections else { return nil }
+		let sectionItem = currentSnapshot.section(at: section).sectionItem
+		let view = footerViewProvider?(tableView, sectionItem, section)
+		if let view = view {
+			footerViewUpdater?(tableView, view, sectionItem, section, false)
+		}
+		return view
+	}
+	
+	public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+		didSelectCallback?(tableView, currentSnapshot.item(at: indexPath), indexPath)
 	}
 
 	/// the table view
@@ -61,8 +98,15 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 	/// called when we need a header/footer title/view
 	public var headerTitleProvider: HeaderFooterTitleProvider?
 	public var footerTitleProvider: HeaderFooterTitleProvider?
+	
+	// called when we are delegate
 	public var headerViewProvider: HeaderFooterViewProvider?
 	public var footerViewProvider: HeaderFooterViewProvider?
+	public var headerViewUpdater: HeaderFooterViewUpdater?
+	public var footerViewUpdater: HeaderFooterViewUpdater?
+	
+	// called when we are delegate
+	public var didSelectCallback: SelectionCallback?
 
 	/// our actual snapshot
 	private var actualSnapshot = Snapshot.init()
@@ -123,6 +167,18 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 									 updateData: {actualSnapshot = $0},
 									 updateItem: {cellUpdater?(tableView, $0, $1, $2, $3)},
 									 completion: completion)
+		
+		for index in 0..<currentSnapshot.sections.count {
+			let sectionItem = currentSnapshot.sections[index].sectionItem
+			
+			if let headerView = tableView.headerView(forSection: index) {
+				headerViewUpdater?(tableView, headerView, sectionItem, index, animated)
+			}
+			
+			if let footerView = tableView.footerView(forSection: index) {
+				footerViewUpdater?(tableView, footerView, sectionItem, index, animated)
+			}
+		}
 	}
 }
 
