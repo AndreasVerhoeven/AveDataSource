@@ -99,3 +99,6 @@ class ViewController: UITableViewController {
 	}
 }
 
+extension Int: Identifiable {
+	public var id: Self { self }
+}

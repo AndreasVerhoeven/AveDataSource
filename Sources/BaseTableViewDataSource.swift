@@ -24,11 +24,20 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 	/// called when we need a header/footer title
 	public typealias HeaderFooterTitleProvider = (_ tableView: UITableView, _ section: SectionType, _ index: Int) -> String?
 	
-	// called when a header/footer is updated
+	/// called when a header/footer is updated
 	public typealias HeaderFooterViewUpdater = (_ tableView: UITableView, _ view: UIView, _ section: SectionType, _ index: Int, _ animated: Bool) -> Void
 	
-	// called when a row is selected
+	/// called when a row is selected
 	public typealias SelectionCallback = (_ tableView: UITableView, _ item: ItemType, _ indexPath: IndexPath) -> Void
+	
+	/// called when we query if a row is editable
+	public typealias CanEditRowCallback = (_ tableView: UITableView, _ item: ItemType, _ indexPath: IndexPath) -> Bool?
+	
+	/// called when commiting editor for a row
+	public typealias CommitEditingCallback = (_ tableView: UITableView, _ item: ItemType, _ indexPath: IndexPath, _ style: UITableViewCell.EditingStyle) -> Void
+	
+	/// called when committing a move operation
+	public typealias MoveCallback = (_ tableView: UITableView, _ source: ItemType, _ sourceIndexPath: IndexPath, _ destination: ItemType?, _ destionationIndexPath: IndexPath) -> Void
 
 	/// MARK: - UITableViewDataSource
 	public func numberOfSections(in tableView: UITableView) -> Int {
@@ -81,6 +90,27 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 		return view
 	}
 	
+	public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+		let item = currentSnapshot.item(at: indexPath)
+		return canEditRow?(tableView, item, indexPath) ?? true
+	}
+	
+	public func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
+		let item = currentSnapshot.item(at: indexPath)
+		return canMoveRow?(tableView, item, indexPath) ?? false
+	}
+	
+	public func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+		let item = currentSnapshot.item(at: indexPath)
+		commitEditingStyle?(tableView, item, indexPath, editingStyle)
+	}
+	
+	public func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+		guard let sourceItem = currentSnapshot.itemOrNil(at: sourceIndexPath) else { return }
+		let destinationItem = currentSnapshot.itemOrNil(at: destinationIndexPath)
+		moveCallback?(tableView, sourceItem, sourceIndexPath, destinationItem, destinationIndexPath)
+	}
+	
 	public func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		didSelectCallback?(tableView, currentSnapshot.item(at: indexPath), indexPath)
 	}
@@ -99,14 +129,18 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 	public var headerTitleProvider: HeaderFooterTitleProvider?
 	public var footerTitleProvider: HeaderFooterTitleProvider?
 	
-	// called when we are delegate
+	/// called when we are delegate
 	public var headerViewProvider: HeaderFooterViewProvider?
 	public var footerViewProvider: HeaderFooterViewProvider?
 	public var headerViewUpdater: HeaderFooterViewUpdater?
 	public var footerViewUpdater: HeaderFooterViewUpdater?
-	
-	// called when we are delegate
 	public var didSelectCallback: SelectionCallback?
+	
+	/// called when editing
+	public var canEditRow: CanEditRowCallback?
+	public var canMoveRow: CanEditRowCallback?
+	public var commitEditingStyle: CommitEditingCallback?
+	public var moveCallback: MoveCallback?
 
 	/// our actual snapshot
 	private var actualSnapshot = Snapshot.init()
