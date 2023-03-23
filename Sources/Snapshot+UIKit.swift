@@ -121,6 +121,7 @@ extension SnapshotProtocol {
 					  sectionOffset: Int = 0,
 					  updateData: (Self) -> Void,
 					  updateItem: (_ cell: UITableViewCell, _ item: Section.ItemType, _ indexPath: IndexPath, _ animated: Bool) -> Void,
+					  rowAnimation: UITableView.RowAnimation = .fade,
 					  completion: ((Bool) -> Void)? = nil) {
 
 		tableView.performBatchUpdates({
@@ -129,11 +130,11 @@ extension SnapshotProtocol {
 						 sectionOffset: sectionOffset,
 						 visibleItems: visibleItems,
 						 updateItem: updateItem,
-						 deleteSections: {tableView.deleteSections($0, with: .fade)},
-						 insertSections: {tableView.insertSections($0, with: .fade)},
+						 deleteSections: {tableView.deleteSections($0, with: rowAnimation)},
+						 insertSections: {tableView.insertSections($0, with: rowAnimation)},
 						 moveSection: {tableView.moveSection($0, toSection: $1)},
-						 deleteItems: {tableView.deleteRows(at: $0, with: .fade)},
-						 insertItems: {tableView.insertRows(at: $0, with: .fade)},
+						 deleteItems: {tableView.deleteRows(at: $0, with: rowAnimation)},
+						 insertItems: {tableView.insertRows(at: $0, with: rowAnimation)},
 						 moveItem: {tableView.moveRow(at: $0, to: $1)},
 						 updateData: updateData)
 		}, completion: completion)

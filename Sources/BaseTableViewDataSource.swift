@@ -141,6 +141,9 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 	public var canMoveRow: CanEditRowCallback?
 	public var commitEditingStyle: CommitEditingCallback?
 	public var moveCallback: MoveCallback?
+	
+	/// default row animation
+	public var defaultRowAnimation: UITableView.RowAnimation = .fade
 
 	/// our actual snapshot
 	private var actualSnapshot = Snapshot.init()
@@ -197,10 +200,11 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 		}
 		
 		actualSnapshot.applyChanges(from: snapshot,
-									 to: tableView,
-									 updateData: {actualSnapshot = $0},
-									 updateItem: {cellUpdater?(tableView, $0, $1, $2, $3)},
-									 completion: completion)
+									to: tableView,
+									updateData: {actualSnapshot = $0},
+									updateItem: {cellUpdater?(tableView, $0, $1, $2, $3)},
+									rowAnimation: defaultRowAnimation,
+									completion: completion)
 		
 		for index in 0..<currentSnapshot.sections.count {
 			let sectionItem = currentSnapshot.sections[index].sectionItem
