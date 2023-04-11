@@ -92,7 +92,7 @@ open class BaseTableViewDataSource<Snapshot: SnapshotProtocol> : NSObject, UITab
 	
 	public func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
 		let item = currentSnapshot.item(at: indexPath)
-		return canEditRow?(tableView, item, indexPath) ?? true
+		return canEditRow?(tableView, item, indexPath) ?? (commitEditingStyle != nil)
 	}
 	
 	public func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
