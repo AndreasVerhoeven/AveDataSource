@@ -96,10 +96,23 @@ public struct Snapshot<SectionType: Identifiable, ItemType: Identifiable>: Snaps
 
 	/// Adds items to a section.
 	/// If the section does not exist, it will be appended at the end.
-	/// If the section exist, the item will be added to the existing section.
+	/// If the section exist, the items will be added to the existing section.
 	public mutating func addItems(_ items: [ItemType], to section: SectionType) {
 		guard let index = sections.firstIndex(where: { $0.sectionItem.id == section.id }) else { return addItems(items, for: section) }
 		sections[index].items.append(contentsOf: items)
+	}
+	
+	/// Adds a section with the given item.
+	/// The section will be appended at the end, regardless if there already is a section with the same id.
+	public mutating func addItem(_ item: ItemType, for section: SectionType) {
+		addItems([item], for: section)
+	}
+	
+	/// Adds an item to a section.
+	/// If the section does not exist, it will be appended at the end.
+	/// If the section exist, the item will be added to the existing section.
+	public mutating func addItem(_ item: ItemType, to section: SectionType) {
+		addItems([item], to: section)
 	}
 
 	/// Updates the items in a section
